@@ -1,0 +1,563 @@
+<!-------------------------------------------------------->
+<!--       Map page main code                           -->
+<!--       Time: April 13 2017                          -->
+<!-------------------------------------------------------->
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <title>Travel Planner</title>
+
+        <!-- style for map container and autocomplete direction function -->
+        <link rel="stylesheet" type="text/css" href="MainMap.css">
+
+
+        <!-- set style for attraction overview panel -->
+        <link rel="stylesheet" type="text/css" href="OverviewPanel.css">
+
+
+        <!-- The list source library and the for the web page -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <!-- Bootstrap core CSS -->
+        <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom fonts for this template -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Josefin+Slab:100,300,400,600,700,100italic,300italic,400italic,600italic,700italic" rel="stylesheet" type="text/css">
+
+        <!-- Custom styles for this template -->
+        <link href="css/business-casual.css" rel="stylesheet">
+
+        <script src= "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+        <!-- The javascript functions -->
+        <script>
+            // set global variables
+            var map;
+            var Option;
+            var attracMarker = [];
+            var showMarker = [];
+            var combo = [];
+            var directionsDisplay;
+            var trip = [];
+            var tripName;
+            var infowindow;
+            var parkMarker = [];
+
+            // initialize the map
+            function initMap() {
+                // add combo box information
+                var file = 'attraction.csv';
+                d3.csv(file, function(rows) {
+                    var mycombo = document.getElementById('selAttractNameCombo');
+                    for(var i = 0 ; i < rows.length ; i++)
+                    {
+                        Option = document.createElement('Option');
+                        Option.value = rows[i]['imgURL'];
+                        Option.text = rows[i]['name'];
+                        Option.latitude = rows[i]['Lat'];
+                        Option.longitude = rows[i]['Lng'];
+                        Option.descript = rows[i]['Descript'];
+                        Option.website = rows[i]['Website'];
+                        mycombo.add(Option);
+                    }
+
+
+                    combo = document.getElementById("selAttractNameCombo");
+                    document.getElementById("attracImage").innerHTML = combo.options[combo.selectedIndex].value;
+
+
+                });
+                var style = [
+                    {
+                        "featureType": "landscape",
+                        "stylers": [
+                            {
+                                "visibility": "simplified"
+                            },
+                            {
+                                "color": "#2b3f57"
+                            },
+                            {
+                                "weight": 0.1
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "administrative",
+                        "stylers": [
+                            {
+                                "visibility": "on"
+                            },
+                            {
+                                "hue": "#ff0000"
+                            },
+                            {
+                                "weight": 0.4
+                            },
+                            {
+                                "color": "#ffffff"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "labels.text",
+                        "stylers": [
+                            {
+                                "weight": 1.3
+                            },
+                            {
+                                "color": "#FFFFFF"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "color": "#f55f77"
+                            },
+                            {
+                                "weight": 3
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.arterial",
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "color": "#f55f77"
+                            },
+                            {
+                                "weight": 1.1
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.local",
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "color": "#f55f77"
+                            },
+                            {
+                                "weight": 0.4
+                            }
+                        ]
+                    },
+                    {},
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "labels",
+                        "stylers": [
+                            {
+                                "weight": 0.8
+                            },
+                            {
+                                "color": "#ffffff"
+                            },
+                            {
+                                "visibility": "on"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.local",
+                        "elementType": "labels",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.arterial",
+                        "elementType": "labels",
+                        "stylers": [
+                            {
+                                "color": "#ffffff"
+                            },
+                            {
+                                "weight": 0.7
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi",
+                        "elementType": "labels",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi",
+                        "stylers": [
+                            {
+                                "color": "#6c5b7b"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "water",
+                        "stylers": [
+                            {
+                                "color": "#f3b191"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "transit.line",
+                        "stylers": [
+                            {
+                                "visibility": "on"
+                            }
+                        ]
+                    }
+                ];
+                // set name for style map
+                var styledMapType = new google.maps.StyledMapType(style, {name: "Travel"});
+
+                //create map option
+                var mapOptions = {
+                    center: {lat: 37.782308, lng: -122.408372},
+                    zoom: 13,
+                    mapTypeControlOptions: {
+                        mapTypeIds: [google.maps.MapTypeId.ROADMAP, "Travel", google.maps.MapTypeId.SATELLITE],
+                        position: google.maps.ControlPosition.TOP_CENTER
+                    },
+                    mapTypeId: "Travel",
+                    mapTypeControl: true,
+                    zoomControl: true,
+                    zoomControlOptions:{
+                        position: google.maps.ControlPosition.LEFT_CENTER
+                    },
+                    scaleControl: true,
+                    streetViewControl: true,
+                    streetViewControlOptions:{
+                        position: google.maps.ControlPosition.LEFT_CENTER
+                    }
+                };
+
+                map = new google.maps.Map(document.getElementById('map'), mapOptions);
+                map.mapTypes.set("Travel", styledMapType);
+
+
+                tripRou();
+                clearRoute();
+            }
+        </script>
+
+
+        <script>
+            function openNav() {
+                document.getElementById("mySidenav").style.width = "400px";
+                document.getElementById("map").style.marginLeft = "400px";
+            }
+            function closeNav() {
+                document.getElementById("mySidenav").style.width = "0";
+                document.getElementById("map").style.marginLeft= "0";
+            }
+
+        </script>
+
+        <script>
+            function attractNameChange(){
+                document.getElementById("attracImage").innerHTML = combo.options[combo.selectedIndex].value;
+                ClearMarkers(parkMarker);
+            }
+
+            function ShowAttraction() {
+                if (showMarker !== null){
+                    ClearMarkers(showMarker);
+                }
+
+                document.getElementById("attracName").innerHTML = combo.options[combo.selectedIndex].text;
+                document.getElementById("attracDescrip").innerHTML = combo.options[combo.selectedIndex].descript;
+                document.getElementById("attracWeb").innerHTML = combo.options[combo.selectedIndex].website;
+
+                placeShowMarker(combo.options[combo.selectedIndex].latitude, combo.options[combo.selectedIndex].longitude);
+
+            }
+
+            function placeShowMarker(Lat, Lng) {
+                var img ={
+                    url:"http://www.myiconfinder.com/uploads/iconsets/256-256-56165014858e6dbadaf3ba00d782f125.png",
+                    scaledSize: new google.maps.Size(50,50)
+                };
+                var markerOptions = {
+                    position: new google.maps.LatLng(Lat, Lng),
+                    map:map,
+                    animation: google.maps.Animation.DROP,
+                    icon: img
+                };
+                var marker = new google.maps.Marker(markerOptions);
+                showMarker.push(marker);
+            }
+
+
+            function placeAddMarker(Lat, Lng) {
+                var img ={
+                    url:"http://a.dryicons.com/images/icon_sets/coquette_part_9_icons_set/png/128x128/favorite_place.png",
+                    scaledSize: new google.maps.Size(50,50)
+                };
+                var markerOptions = {
+                    position: new google.maps.LatLng(Lat, Lng),
+                    map:map,
+                    animation: google.maps.Animation.DROP,
+                    icon:img
+                };
+                var marker = new google.maps.Marker(markerOptions);
+                attracMarker.push(marker);
+            }
+
+
+            function AddAttraction() {
+                if (showMarker !== null){
+                    ClearMarkers(showMarker);
+                }
+
+                document.getElementById("attracName").innerHTML = combo.options[combo.selectedIndex].text;
+                document.getElementById("attracDescrip").innerHTML = combo.options[combo.selectedIndex].descript;
+                document.getElementById("attracWeb").innerHTML = combo.options[combo.selectedIndex].website;
+
+                placeAddMarker(combo.options[combo.selectedIndex].latitude, combo.options[combo.selectedIndex].longitude);
+                trip.push(combo.options[combo.selectedIndex].text);
+                console.log(trip);
+
+            }
+
+
+            function ClearMarkers(markerArray) {
+                for (var i = 0; i < markerArray.length; i++){
+                    markerArray[i].setMap(null);
+                }
+                markerArray.length=0;
+
+                document.getElementById("attracName").innerHTML = null;
+                document.getElementById("attracDescrip").innerHTML = null;
+                document.getElementById("attracWeb").innerHTML = null;
+            }
+
+            function ClearRouteName() {
+                trip.length = 0;
+            }
+
+            function AddTripPlan() {
+                for (var i = 0; i < trip.length; i++){
+                    if ( i === 0){
+                        tripName = trip[i].toString();
+                    }
+                    else {tripName = tripName + "<br>" + trip[i].toString();}
+                    console.log(tripName);
+                }
+                console.log(tripName);
+                document.getElementById("trip_name").innerHTML = tripName;
+            }
+
+
+            function searchPlaces() {
+                // info window for search places
+                infowindow = new google.maps.InfoWindow();
+                var service = new google.maps.places.PlacesService(map);
+                    service.nearbySearch({
+                        location: new google.maps.LatLng(combo.options[combo.selectedIndex].latitude, combo.options[combo.selectedIndex].longitude),
+                        radius: 2000,
+                        type: ['parking']
+                    }, callback);
+            }
+
+
+            function callback(results, status) {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    for (var i = 0; i < results.length; i++) {
+                        createMarker(results[i]);
+                    }
+                }
+            }
+
+            function createMarker(place) {
+                var placeLoc = place.geometry.location;
+                var img ={
+                    url:"https://www.xtreet.org/img/icn_big_marker_parking.png",
+                    scaledSize: new google.maps.Size(30,30)
+                };
+                var markerOptions = {
+                    position: place.geometry.location,
+                    map: map,
+                    icon: img
+                };
+                var markers = new google.maps.Marker(markerOptions);
+
+                google.maps.event.addListener(markers, 'click', function() {
+                    infowindow.setContent("Parking Name: " + place.name);
+                    infowindow.open(map, this);
+                });
+                parkMarker.push(markers)
+            }
+
+
+        </script>
+
+        <script>
+            function tripRou() {
+                var directionsService = new google.maps.DirectionsService;
+                directionsDisplay = new google.maps.DirectionsRenderer({
+                    polylineOptions: {
+                        strokeColor: "#e8e643",
+                        strokeWeight: 6
+                    }
+                });
+
+                document.getElementById('TravelMode').addEventListener('change', function() {
+                    calculateAndDisplayRoute(directionsService, directionsDisplay);
+                });
+
+                document.getElementById('submit').addEventListener('click', function() {
+                    directionsDisplay.setMap(map);
+                    calculateAndDisplayRoute(directionsService, directionsDisplay,attracMarker);
+                    ClearMarkers(attracMarker);
+                });
+            }
+
+            function calculateAndDisplayRoute(directionsService, directionsDisplay, attracMarker) {
+                var waypts = [];
+                for (var i = 1; i < attracMarker.length - 1; i++) {
+                        waypts.push({
+                            location: attracMarker[i].position,
+                            stopover: true
+                        });
+                }
+
+                var selectedMode = document.getElementById('TravelMode').value;
+
+                directionsService.route({
+                    origin: attracMarker[0].position,
+                    destination: attracMarker[attracMarker.length - 1].position,
+                    waypoints: waypts,
+                    optimizeWaypoints: true,
+                    travelMode: google.maps.TravelMode[selectedMode]
+                }, function(response, status) {
+                    if (status === 'OK') {
+                        directionsDisplay.setDirections(response);
+                    }
+                    else {
+                        window.alert('Directions request failed due to ' + status);
+                    }
+                });
+                map.setZoom(10);
+            }
+
+            function clearRoute() {
+                document.getElementById("closeRoute").addEventListener("click", function initMap() {
+                    directionsDisplay.setMap(null);
+                    map.setCenter({lat: 37.782308, lng: -122.408372});
+                    map.setZoom(13);
+                    document.getElementById("trip_name").innerHTML = null;
+                    for (var i = 0; i < parkMarker.length; i++){
+                        parkMarker[i].setMap(null);
+                    }
+                });
+            }
+
+
+
+        </script>
+
+    </head>
+    <body>
+
+        <div id="header">
+            <nav class="navbar navbar-toggleable-md navbar-light navbar-custom bg-faded1 py-lg-4">
+
+
+                <div class="container">
+                    <div class="collapse navbar-collapse" id="navbarExample">
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item active px-lg-4">
+                                <a class="nav-link text-uppercase text-expanded" href="index.html">Home <span class="sr-only">(current)</span></a>
+                            </li>
+                            <li class="nav-item px-lg-4">
+                                <a class="nav-link text-uppercase text-expanded" href="TravlePlanner.html">Plan Your Trip</a>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+
+        <div id="map"></div>
+        <script src= "https://maps.googleapis.com/maps/api/js?key=AIzaSyCxloCQW3KyBV5oTQvuccDd2jtTGM5-AvY&libraries=places&callback=initMap" async defer></script>
+
+        <div id="mySidenav" class="sidenav">
+
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <br>
+                <br>
+                    <p id="attracImage">
+                    </p>
+
+            <p>
+            <p style="margin: 20px;">
+                <button type="button" class="w3-btn w3-white w3-border w3-border-blue w3-round-xlarge" onclick ="ShowAttraction()">Show</button>
+                <button type="button" class="w3-btn w3-white w3-border w3-border-blue w3-round-xlarge" onclick ="AddAttraction(); AddTripPlan();">Add</button>
+                <button type="button" class="w3-btn w3-white w3-border w3-border-blue w3-round-xlarge" onclick ="ClearMarkers(showMarker); ClearMarkers(attracMarker);ClearMarkers(parkMarker);ClearRouteName();">Clear</button>
+                <button type="button" class="w3-btn w3-white w3-border w3-border-blue w3-round-xlarge" onclick ="searchPlaces();" ><img src="http://www.freeiconspng.com/uploads/parking-icon-png-22.png" style="width: 30px; height: 30px;"></button>
+            </p>
+            </p>
+
+            <div style="margin: 20px;" class="styled-select rounded">
+                <select id="selAttractNameCombo" onchange="attractNameChange()"> </select>
+            </div>
+
+
+            <b><p id = "attracName" class = "font_styles"></p></b>
+            <p id = "attracDescrip" class = "font_styles"></p>
+            <p>
+                <div id = "attracWeb"></div>
+            </p>
+
+        </div>
+
+        <div id = "openButton" >
+            <a href = "#" id = "open_button" onclick="openNav()">Open</a>
+        </div>
+
+
+        <!-- float panel -->
+        <div id="float_panel">
+            <div>
+                <fieldset>
+                    <legend class="legend">Plan your trip</legend>
+                    <b style="margin: 5px; color: #dfdfe0; ">Choose your travel mode: </b>
+                    <select id="TravelMode" class="w3-btn w3-white w3-border w3-border-blue w3-round-xlarge">
+                        <option value="DRIVING">Driving</option>
+                        <option value="TRANSIT">Transit</option>
+                        <option value="WALKING">Walking</option>
+                    </select>
+                    <button type="button" class="w3-btn w3-white w3-border w3-border-blue w3-round-xlarge" id ="submit" onclick="tripRou();searchPlaces()">Submit</button>
+                    <button type="button" class="w3-btn w3-white w3-border w3-border-blue w3-round-xlarge" id="closeRoute" onclick="ClearMarkers(showMarker); ClearMarkers(attracMarker);ClearMarkers(parkMarker);ClearRouteName()">Restart</button>
+                <div>
+                    <p class="trip_route_title">Your trip passes through: </p>
+                    <p id = "trip_name" class="trip_route"></p>
+                </div>
+                </fieldset>
+            </div>
+        </div>
+    </body>
+    <audio controls autoplay>
+        <source src="mpthreetest.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+</html>
