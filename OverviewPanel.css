@@ -8,7 +8,7 @@ body {  font-family: "Lato", sans-serif; }
     z-index: 1;
     top: 0;
     left: 0;
-    background-color: #6c5b7b;
+    background-color: #39a0b6;
     overflow-x: hidden;
     transition: 0.5s;
     padding-top: 40px;
@@ -43,13 +43,13 @@ body {  font-family: "Lato", sans-serif; }
 #openButton a {
     position: absolute;
     top: 100px;
-    left: -20px;
+    left: -50px;
     transition: 0.3s;
-    padding: 15px;
-    width: 100px;
+    padding: 40px;
+    width: 350px;
     text-decoration: none;
-    font-size: 20px;
-    color: white;
+    font-size: 30px;
+    color: #fffe6a;
     border-radius: 0 15px 15px 0;
     border-color: #2c2c2c;
     border-style: solid;
@@ -57,7 +57,7 @@ body {  font-family: "Lato", sans-serif; }
     box-shadow: 5px 5px 5px grey;
 }
 #openButton a:hover { left: 0;}
-#open_button {  top: 20px;  background-color: #39a0b6; }
+#open_button {  top: 200px;  background-color: #39a0b6; }
 
 #float_panel {
     height: 500px;
@@ -67,7 +67,7 @@ body {  font-family: "Lato", sans-serif; }
     top: 200px;
     right: 50px;
     background: transparent;
-    background-color: #6c5b7b;
+    background-color: #22737b;
     opacity: 0.9;
     padding-top: 40px;
     border-radius: 50px;

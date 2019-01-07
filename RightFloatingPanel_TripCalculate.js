@@ -1,6 +1,3 @@
-/**
- * Created by ZFu on 4/29/2017.
- */
 
 // trip route calculation function, called by the initialize map function
 function tripRou() {
@@ -39,7 +36,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay, attracMa
 
 
     var originPosition = autocompleteOrigin();
-    console.log(originPosition);
+    // console.log(originPosition.length);
 
     directionsService.route({
         origin: originPosition,
@@ -47,10 +44,15 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay, attracMa
         waypoints: waypts,
         optimizeWaypoints: true,
         travelMode: google.maps.TravelMode[selectedMode]
-    }, function(response, status) {
+    },
+        function(response, status) {
+
         if (status === 'OK') {
             directionsDisplay.setDirections(response);
         }
+        else if(status = "NOT_FOUND"){
+            window.alert('PLEASE ENTER YOUR TRIP ORIGIN FIRST!!!');
+            }
         else {
             window.alert('Directions request failed due to ' + status);
         }
@@ -86,55 +88,18 @@ function clearRoute() {
             parkMarker[i].setMap(null);
         }
     });
+    ClearRouteName()
 }
 
 
 // enter the trip origin
+let origin=[];
 
 function autocompleteOrigin() {
     var autocomplete = new google.maps.places.Autocomplete(document.getElementById('Origin'));
     autocomplete.bindTo('bounds', map);
 
     //var place = autocomplete.getPlace();
-    return  document.getElementById('Origin').value;
-
-
-    //autocomplete.addListener('place_changed', function() {
-        //var place = autocomplete.getPlace();
-        //var originPosition = place.geometry.location;
-
-    //});
-    //return originPosition;
+    origin = document.getElementById('Origin').value;
+    return origin
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

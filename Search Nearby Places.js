@@ -1,7 +1,3 @@
-/**
- * Created by ZFu on 4/29/2017.
- */
-
 
 // search nearby places, in this project we just select parking places in 2000 radius
 function searchPlaces() {
@@ -36,7 +32,7 @@ function callback(results, status) {
 function createMarker(place) {
     var placeLoc = place.geometry.location;
     var img ={
-        url:"https://www.xtreet.org/img/icn_big_marker_parking.png",
+        url:"https://www.clipartmax.com/png/middle/283-2830878_x-parking-comments-parking-icon-vector-png.png",
         scaledSize: new google.maps.Size(30,30)
     };
     var markerOptions = {

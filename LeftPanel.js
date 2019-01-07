@@ -1,6 +1,3 @@
-/**
- * Created by ZFu on 4/29/2017.
- */
 
 // open and close the left panel
 function openNav() {
@@ -73,7 +70,7 @@ function AddAttraction() {
 // show marker on the map, connecting with the add attraction button.
 function placeAddMarker(Lat, Lng) {
     var img ={
-        url:"http://a.dryicons.com/images/icon_sets/coquette_part_9_icons_set/png/128x128/favorite_place.png",
+        url:"https://cdn0.iconfinder.com/data/icons/material-design-flat/24/location-512.png",
         scaledSize: new google.maps.Size(50,50)
     };
     var markerOptions = {
